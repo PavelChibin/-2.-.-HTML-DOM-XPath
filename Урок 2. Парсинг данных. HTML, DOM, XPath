@@ -1,0 +1,202 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 39,
+   "id": "528922ae",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from pprint import pprint\n",
+    "from lxml import html\n",
+    "import requests\n",
+    "import time"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 40,
+   "id": "c5b02611",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "header = {\n",
+    "    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36'\n",
+    "}"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 57,
+   "id": "b7b9e5f2",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "mail_url = 'https://news.mail.ru'"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 58,
+   "id": "f936e38f",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "response = requests.get(mail_url, headers = header)   "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 59,
+   "id": "d4c37c5c",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<Response [200]>"
+      ]
+     },
+     "execution_count": 59,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "response"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 60,
+   "id": "3c17928e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "root = html.fromstring(response.text)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 61,
+   "id": "f0ee52f0",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<Element html at 0x1a8c17a3ea0>"
+      ]
+     },
+     "execution_count": 61,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "root"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 62,
+   "id": "d05309d6",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "news = root.xpath('//div[@class=\"newsitem newsitem_height_fixed js-ago-wrapper\"]')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 63,
+   "id": "a9f5e173",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[<Element div at 0x1a8c22bf8b0>,\n",
+       " <Element div at 0x1a8c2307860>,\n",
+       " <Element div at 0x1a8c23077c0>,\n",
+       " <Element div at 0x1a8c2307ea0>]"
+      ]
+     },
+     "execution_count": 63,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "news"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 67,
+   "id": "a9797573",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Новость - ['Медведев назвал страны ЕС и НАТО участниками терактов']\n",
+      "Источник - ['© РИА Новости']\n",
+      "Ссылка - ['https://news.mail.ru/politics/55270887/']\n",
+      "Время публикации - ['2023-03-02T21:52:37+03:00']\n",
+      "Новость - ['Названы основные финансовые шаги к статусу инвестора']\n",
+      "Источник - ['Известия']\n",
+      "Ссылка - ['https://news.mail.ru/economics/55257132/']\n",
+      "Время публикации - ['2023-03-02T18:10:10+03:00']\n",
+      "Новость - ['Оригинальный сценарий «Унесённых ветром» отличался жестокостью по отношению к рабам']\n",
+      "Источник - ['Life.ru']\n",
+      "Ссылка - ['https://news.mail.ru/society/55270132/']\n",
+      "Время публикации - ['2023-03-02T20:13:16+03:00']\n",
+      "Новость - ['Анатолия Быкова оставили без статьи']\n",
+      "Источник - ['Коммерсантъ']\n",
+      "Ссылка - ['https://news.mail.ru/incident/55268713/']\n",
+      "Время публикации - ['2023-03-02T18:21:40+03:00']\n"
+     ]
+    }
+   ],
+   "source": [
+    "for new in news:\n",
+    "    herf = new.xpath(\".//span[@class='cell']/a/@href\")\n",
+    "    title = new.xpath(\".//span[@class='cell']/a/span/text()\")\n",
+    "    source = new.xpath(\".//div[@class='newsitem__params']/span[@class='newsitem__param']/text()\")\n",
+    "    time_pub = new.xpath(\".//div[@class='newsitem__params']/span[@class='newsitem__param js-ago']/@datetime\")\n",
+    "    print(f'Новость - {title}\\nИсточник - {source}\\nСсылка - {herf}\\nВремя публикации - {time_pub}')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "0b53ad5b",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.9.12"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
